@@ -7,7 +7,11 @@ from pydantic import BaseModel
 class Operator(str, Enum):
     LE = "<="
     GE = ">="
-    EQ = "=="
+    EQ = "="
+
+class ObjectiveType(str, Enum):
+    MIN = "MINIMIZE"
+    MAX = "MAXIMIZE"
 
 class Constraint(BaseModel):
     coefficients: List[float]
@@ -15,6 +19,9 @@ class Constraint(BaseModel):
     rhs: float
 
 class LPProblem(BaseModel):
+    n: int
+    m: int
+    objective: ObjectiveType
     objectiveCoeffs: List[float]
     constraints: List[Constraint]
     variableRestrictions: List[bool]
