@@ -35,9 +35,17 @@ def standardize(req: LPProblem):
 
     # 2- add slack/ surplus/ artificial vars
     num_constraints = len(req.constraints)
+    n = len(final_c)
     num_slack = sum(c.sign == Operator.LE for c in req.constraints)
     num_surplus = sum(c.sign == Operator.GE for c in req.constraints)
     num_art = sum(c.sign in [Operator.GE, Operator.EQ] for c in req.constraints)
+    num_additional = num_slack + num_surplus + num_art
+
+    var_names.extend([""] * num_additional)
+
+    slack_start = n
+    surplus_start = n + num_slack
+    art_start = n + num_slack + num_surplus
 
     slack_matrix = np.zeros((num_constraints, num_slack))
     surplus_matrix = np.zeros((num_constraints, num_surplus))
@@ -48,21 +56,22 @@ def standardize(req: LPProblem):
     for i, constraint in enumerate(req.constraints):
         if constraint.sign == Operator.LE:
             slack_matrix[i, s] = 1
+            var_names[slack_start + s] = f"s{s+1}"
             s += 1
-            var_names.append(f"s{s}")
 
         elif constraint.sign == Operator.GE:
             surplus_matrix[i, e] = -1
             art_matrix[i, a] = 1
+            var_names[surplus_start + e] = f"s{e+1}"
+            var_names[art_start + a] = f"a{a+1}"
             e += 1
             a += 1
-            var_names.append(f"e{e}")
-            var_names.append(f"a{a}")
+
 
         elif constraint.sign == Operator.EQ:
             art_matrix[i, a] = 1
+            var_names[art_start + a] = f"a{a+1}"
             a += 1
-            var_names.append(f"a{a}")
 
     var_names.append("b")
     # assemble everything together
@@ -71,14 +80,13 @@ def standardize(req: LPProblem):
     full_matrix = np.hstack([rows, slack_matrix, surplus_matrix, art_matrix, rhs])
 
     z = np.array(final_c, dtype=float)
-    num_additional = num_slack + num_surplus + num_art
     z = np.concatenate([z, np.zeros(num_additional)])
 
-    n = len(final_c)
+
     return Tableau(
         matrix=full_matrix,
         z=z,
         var_names=var_names,
-        slack_start=n,
-        surplus_start=n + num_slack,
-        art_start=n + num_slack + num_surplus)
+        slack_start=slack_start,
+        surplus_start=surplus_start,
+        art_start=art_start)

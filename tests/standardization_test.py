@@ -1,19 +1,22 @@
 from core.standardization import standardize
-from models.dtos import LPProblem, Constraint, Operator
+from models.dtos import LPProblem, Constraint, Operator, ObjectiveType
 
 print("=============Test1=================")
 req = LPProblem(
+    n=2,
+    m=2,
+    objective="MAXIMIZE",
     objectiveCoeffs=[3, 2],
     variableRestrictions=[True, True],
     constraints = [
         Constraint(
             coefficients=[1, 1],
-            sign=Operator.LE,
+            sign="=",
             rhs=4
         ),
         Constraint(
             coefficients=[1, 0],
-            sign=Operator.LE,
+            sign="<=",
             rhs=2
         )
     ],
@@ -36,6 +39,9 @@ print("========================")
 
 print("=============Test2=================")
 req = LPProblem(
+    n=4,
+    m=3,
+    objective=ObjectiveType.MAX,
     objectiveCoeffs=[-3, 1, 3, -1],
     variableRestrictions=[True, True, True, True],
     constraints = [
@@ -75,6 +81,9 @@ print("========================")
 
 print("=============Test3=================")
 req = LPProblem(
+    n=2,
+    m=2,
+    objective=ObjectiveType.MAX,
     objectiveCoeffs=[30, -4],
     variableRestrictions=[True, False],
     constraints = [
