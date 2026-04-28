@@ -1,0 +1,390 @@
+/* --- Solution Page Layout --- */
+.solution-page {
+  padding: 0 0 40px;
+  /* max-width: 1400px; */
+}
+
+/* --- Status Banner ------------------------------------------------ */
+.solution-page .status-banner {
+  padding: 24px 28px;
+  margin-bottom: 0;
+}
+
+.solution-page .status-banner.optimal {
+  background: linear-gradient(135deg, var(--primary) 0%, #34d399 60%, transparent 100%);
+}
+
+.solution-page .status-banner.infeasible {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 60%, transparent 100%);
+}
+
+.solution-page .status-banner.unbounded {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 60%, transparent 100%);
+}
+
+.solution-page .status-banner .banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 800px;
+}
+
+.solution-page .status-banner .banner-icon-wrap {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.solution-page .status-banner .banner-icon-wrap mat-icon {
+  color: white;
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.solution-page .status-banner .banner-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+
+.solution-page .status-banner .banner-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 2px;
+}
+
+/* --- Value Cards -------------------------------------------------- */
+.solution-page .value-cards {
+  display: flex;
+  gap: 0;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+
+.solution-page .value-card {
+  flex: 1;
+  padding: 24px 28px;
+  background: var(--surface);
+  position: relative;
+  border-right: 1px solid var(--border);
+}
+
+.solution-page .value-card:last-child {
+  border-right: none;
+}
+
+.solution-page .value-card .value-card-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.solution-page .value-card .value-card-label .card-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: var(--primary);
+}
+
+/* Optimal Value Card — teal left border + light mint background */
+.solution-page .optimal-card {
+  border-left: 4px solid var(--primary);
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.solution-page .optimal-card .value-card-label {
+  color: var(--primary);
+}
+
+.solution-page .optimal-card .value-card-label .card-icon {
+  color: var(--primary);
+}
+
+.solution-page .optimal-card .z-star {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+}
+
+.solution-page .optimal-card .z-star .z-number {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.solution-page .optimal-card .z-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Decision Variable Cards — purple left border + light purple background */
+.solution-page .var-card {
+  border-left: 4px solid #7c3aed;
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.solution-page .var-card .value-card-label {
+  color: #7c3aed;
+}
+
+.solution-page .var-card .value-card-label .card-icon {
+  color: #7c3aed;
+}
+
+.solution-page .var-card .var-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #7c3aed;
+  font-family: 'Courier New', monospace;
+}
+
+.solution-page .var-card .var-name .var-number {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.solution-page .var-card .var-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* --- Section Titles --- */
+.solution-page .section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 0 28px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.solution-page .section-title::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* --- Solution Table ----------------------------------------------- */
+.solution-page .solution-table-section {
+  margin-bottom: 28px;
+  margin-top: 28px;
+}
+
+.solution-page .solution-table-card {
+  margin: 0 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.solution-page .solution-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.solution-page .solution-table thead tr {
+  background: rgba(124, 58, 237, 0.06);
+}
+
+.solution-page .solution-table th {
+  padding: 10px 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #7c3aed;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.solution-page .solution-table th.col-val,
+.solution-page .solution-table th.col-status {
+  text-align: right;
+}
+
+.solution-page .solution-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s;
+}
+
+.solution-page .solution-table tbody tr:hover {
+  background: var(--surface-alt);
+}
+
+.solution-page .solution-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.solution-page .solution-table .var-row,
+.solution-page .solution-table .slack-row {
+  background: var(--surface);
+}
+
+.solution-page .solution-table .z-summary-row {
+  background: rgba(16, 185, 129, 0.04);
+  border-top: 2px solid var(--border);
+}
+
+.solution-page .solution-table .z-summary-row .z-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--primary);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.solution-page .solution-table .var-name-cell {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+}
+
+.solution-page .solution-table .var-name-cell.slack-name {
+  color: var(--text-secondary);
+}
+
+.solution-page .solution-table .var-name-cell.z-label {
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.solution-page .solution-table .val-cell {
+  padding: 14px 20px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: var(--text-primary);
+}
+
+.solution-page .solution-table .val-cell.z-val {
+  color: var(--primary);
+}
+
+.solution-page .solution-table .status-cell {
+  padding: 14px 20px;
+  text-align: right;
+}
+
+.solution-page .solution-table .status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.solution-page .solution-table .status-badge.basic {
+  background: var(--primary-light);
+  color: var(--accent);
+}
+
+.solution-page .solution-table .status-badge.non-basic {
+  background: var(--border-light);
+  color: var(--text-muted);
+}
+
+.solution-page .solution-table .status-badge.optimal-badge {
+  background: var(--primary);
+  color: white;
+}
+
+/* --- Representation Section --------------------------------------- */
+.solution-page .representation-section {
+  margin-bottom: 28px;
+}
+
+.solution-page .repr-card {
+  margin: 0 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--primary);
+}
+
+.solution-page .repr-code {
+  font-family: 'Courier New', monospace;
+}
+
+.solution-page .repr-code .repr-line {
+  margin-bottom: 8px;
+}
+
+.solution-page .repr-code .repr-line:last-child {
+  margin-bottom: 0;
+}
+
+.solution-page .repr-code .repr-keyword {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.solution-page .repr-code .repr-values {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.solution-page .repr-code .z-star-line .z-star-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* --- Empty State -------------------------------------------------- */
+.solution-page .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.solution-page .empty-state mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  opacity: 0.3;
+}
+
+.solution-page .empty-state p {
+  font-size: 14px;
+}

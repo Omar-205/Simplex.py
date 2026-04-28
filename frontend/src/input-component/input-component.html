@@ -1,0 +1,177 @@
+<div class="input-page">
+  <!-- ── Coefficient Matrix ───────────────────────────────────────── -->
+  <div class="section-header">
+    <span class="section-title">COEFFICIENT MATRIX</span>
+    <span class="size-badge">{{ n }} variables × {{ m }} constraints</span>
+  </div>
+
+  <div class="matrix-card">
+    <table class="coeff-table">
+      <!--table header-->
+      <thead>
+        <tr>
+          <th class="col-row">ROW</th>
+          @for (c of objectiveCoeffs; track $index) {
+            <th class="col-var">
+              x<sub>{{ $index + 1 }}</sub>
+            </th>
+          }
+
+          <th class="col-sign">SIGN</th>
+          <th class="col-rhs">RHS</th>
+        </tr>
+      </thead>
+      <!--table body-->
+      <tbody>
+        <!-- Objective row -->
+        <tr class="obj-row">
+          <td class="label-cell">Z (Obj)</td>
+          @for (c of objectiveCoeffs; track $index) {
+            <td class="value-cell">
+              <input
+                type="number"
+                [(ngModel)]="objectiveCoeffs[$index]"
+                class="cell-input"
+                placeholder="0"
+              />
+            </td>
+          }
+
+          <td class="sign-cell muted">—</td>
+          <td class="rhs-cell muted">—</td>
+        </tr>
+
+        <!-- Constraint rows -->
+        @for (con of constraints; track $index; let row = $index) {
+          <tr class="constraint-row">
+            <td class="label-cell">
+              C<sub>{{ row + 1 }}</sub>
+            </td>
+            @for (c of con.coefficients; track $index; let col = $index) {
+              <td class="value-cell">
+                <input
+                  type="number"
+                  [(ngModel)]="constraints[row].coefficients[col]"
+                  class="cell-input"
+                  placeholder="0"
+                />
+              </td>
+            }
+
+            <td class="sign-cell">
+              <button class="sign-btn" (click)="cycleMSign(row)">
+                {{ con.sign }} <mat-icon class="chevron">expand_more</mat-icon>
+              </button>
+            </td>
+            <td class="rhs-cell">
+              <input
+                type="number"
+                [(ngModel)]="constraints[row].rhs"
+                class="cell-input rhs-input"
+                placeholder="0"
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Variable Restrictions ─────────────────────────────────────── -->
+  <div class="restrictions-row">
+    <span class="restrictions-label">VARIABLE RESTRICTIONS:</span>
+    <div class="restriction-chips">
+      @for (r of variableRestrictions; track $index; let i = $index) {
+        <button
+          class="restriction-chip"
+          [class.unrestricted]="r === false"
+          (click)="variableRestrictions[i] = r === true ? false : true"
+        >
+          x<sub>{{ i + 1 }}</sub
+          >:
+          {{ r === true ? '≥ 0' : 'URS' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── Standard Form Preview ─────────────────────────────────────── -->
+  <div class="preview-card">
+    <div class="preview-header">
+      <span class="preview-title">STANDARD FORM PREVIEW</span>
+    </div>
+
+    <div class="preview-body">
+      <!-- Objective Function -->
+      <div class="preview-section">
+        <div class="preview-section-label">OBJECTIVE FUNCTION</div>
+        <div class="objective-display">
+          <span
+            class="obj-type"
+            [class.maximize]="objective === 'MAXIMIZE'"
+            [class.minimize]="objective === 'MINIMIZE'"
+          >
+            {{ objective === 'MAXIMIZE' ? 'Maximize' : 'Minimize' }}
+          </span>
+          <span class="obj-formula"> Z = <span [innerHTML]="getStandardFormStr()"></span> </span>
+        </div>
+      </div>
+
+      <div class="preview-divider"></div>
+
+      <!-- Constraints in standard form -->
+      <div class="preview-section">
+        <div class="preview-section-label">SUBJECT TO (STANDARD FORM)</div>
+        <div class="constraints-list">
+          <div *ngFor="let con of constraints; let ci = index" class="std-constraint">
+            <span class="constraint-num">({{ ci + 1 }})</span>
+            <span class="constraint-formula">
+              <span [innerHTML]="getConstraintStr(ci)"></span>
+
+              @if (needsSlack(ci)) {
+                <ng-container>
+                  <span class="slack-var"
+                    >+s<sub>{{ ci + 1 }}</sub>
+                  </span>
+                </ng-container>
+              }
+              @if (needsSurplus(ci)) {
+                <ng-container>
+                  <span class="surplus-var"
+                    >-e<sub>{{ ci + 1 }}</sub>
+                  </span>
+                </ng-container>
+              }
+              @if (needsArtificial(ci)) {
+                <ng-container>
+                  <span class="artificial-var"
+                    >+u<sub>{{ ci + 1 }}</sub>
+                  </span>
+                </ng-container>
+              }
+            </span>
+            <span class="eq-sign">= {{ con.rhs }}</span>
+            <span class="from-badge">(from {{ con.sign }})</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-divider"></div>
+
+      <!-- Non-negativity -->
+      <div class="preview-section">
+        <div class="preview-section-label">NON-NEGATIVITY CONSTRAINTS</div>
+        <div class="non-neg" [innerHTML]="getNonNegativityStr()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Solve Button ───────────────────────────────────────────────── -->
+  <div class="solve-section">
+    <button class="solve-btn" (click)="solve()" [disabled]="isSolving">
+      <mat-icon>play_arrow</mat-icon>
+      <span>{{ isSolving ? 'SOLVING...' : 'SOLVE PROBLEM' }}</span>
+      <div class="solve-btn-shimmer" *ngIf="!isSolving"></div>
+    </button>
+  </div>
+</div>
