@@ -21,32 +21,61 @@ async def solve(req: LPProblem):
     print(tableau)
 
     # mock response for frontend testing
-    return {
-        "status": SolveStatus.OPTIMAL,
-        "snapshots": [
-            {
-                "matrix": [
-                    [1, 1, 1, 0, 4],
-                    [1, 2, 0, 1, 6]
-                ],
-                "z": [-3, -2, 0, 0, 0],
-                "varMap": ["x1", "x2", "s1", "s2"],
-                "slackStart": 2,
-                "surplusStart": 4,
-                "artStart": 4,
-                "rowIdx": None,
-                "colIdx": None,
-                "pivot": None,
-                "enteringVar": None,
-                "leavingVar": None,
-                "basicVars": ["s1", "s2"]
-            }
-        ],
-        "optimalValue": 12,
-        "solution": {
-            "x1": 4,
-            "x2": 0,
-            "s1": 0,
-            "s2": 2
+    return{
+    "status": "optimal",
+    "solution": {"x1": 4, "x2": 0, "s1": 0, "s2": 2},
+    "optimalValue": 12,
+    "snapshots": [
+        {
+            "matrix": [
+                [1, 1, 1, 0, 4],
+                [1, 2, 0, 1, 6]
+            ],
+            "z": [-3, -2, 0, 0, 0],
+            "varMap": ["X1", "X2", "S1", "S2"],
+            "slackStart": 2,
+            "surplusStart": 4,
+            "artStart": 4,
+            "rowIdx": None,
+            "colIdx": None,
+            "pivot": None,
+            "enteringVar": None,
+            "leavingVar": None,
+            "basicVars": ["s1", "s2"]
+        },
+        {
+            "matrix": [
+                [1, 1, 1, 0, 4],
+                [1, 2, 0, 1, 6]
+            ],
+            "z": [-3, -2, 0, 0, 0],
+            "varMap": ["X1", "X2", "S1", "S2"],
+            "slackStart": 2,
+            "surplusStart": 4,
+            "artStart": 4,
+            "rowIdx": 0,
+            "colIdx": 0,
+            "pivot": 1,
+            "enteringVar": "x1",
+            "leavingVar": "s1",
+            "basicVars": ["s1", "s2"]
+        },
+        {
+            "matrix": [
+                [1, 1, 1, 0, 4],
+                [0, 1, -1, 1, 2]
+            ],
+            "z": [0, 1, 3, 0, 12],
+            "varMap": ["X1", "X2", "S1", "S2"],
+            "slackStart": 2,
+            "surplusStart": 4,
+            "artStart": 4,
+            "rowIdx": None,
+            "colIdx": None,
+            "pivot": None,
+            "enteringVar": None,
+            "leavingVar": None,
+            "basicVars": ["x1", "s2"]
         }
-    }
+    ]
+}
