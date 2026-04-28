@@ -52,8 +52,6 @@ export class LpStateService {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
 
-    // const result = of(MOCK_BACKEND_RESPONSE);
-
     const result = this.http.post<any>(this.API_URL, problem);
 
     return result.pipe(
@@ -86,62 +84,3 @@ export class LpStateService {
     this.loadingSubject.next(false);
   }
 }
-
-const MOCK_BACKEND_RESPONSE = {
-  status: 'optimal' as const,
-  solution: { x1: 4, x2: 0, s1: 0, s2: 2 },
-  optimalValue: 12,
-  snapshots: [
-    {
-      matrix: [
-        [1, 1, 1, 0, 4],
-        [1, 2, 0, 1, 6],
-      ],
-      z: [-3, -2, 0, 0, 0],
-      varMap: ['X1', 'X2', 'S1', 'S2'],
-      slackStart: 2,
-      surplusStart: 4,
-      artStart: 4,
-      rowIdx: null,
-      colIdx: null,
-      pivot: null,
-      enteringVar: null,
-      leavingVar: null,
-      basicVars: ['s1', 's2'],
-    },
-    {
-      matrix: [
-        [1, 1, 1, 0, 4],
-        [1, 2, 0, 1, 6],
-      ],
-      z: [-3, -2, 0, 0, 0],
-      varMap: ['X1', 'X2', 'S1', 'S2'],
-      slackStart: 2,
-      surplusStart: 4,
-      artStart: 4,
-      rowIdx: 0,
-      colIdx: 0,
-      pivot: 1,
-      enteringVar: 'x1',
-      leavingVar: 's1',
-      basicVars: ['s1', 's2'],
-    },
-    {
-      matrix: [
-        [1, 1, 1, 0, 4],
-        [0, 1, -1, 1, 2],
-      ],
-      z: [0, 1, 3, 0, 12],
-      varMap: ['X1', 'X2', 'S1', 'S2'],
-      slackStart: 2,
-      surplusStart: 4,
-      artStart: 4,
-      rowIdx: null,
-      colIdx: null,
-      pivot: null,
-      enteringVar: null,
-      leavingVar: null,
-      basicVars: ['x1', 's2'],
-    },
-  ],
-};
