@@ -1,0 +1,111 @@
+<div class="fixed-header">
+  <mat-toolbar class="title-bar">
+    <mat-icon class="logo-icon">functions</mat-icon>
+    <div class="title-container">
+      <span class="main-title">LP Simplex Solver</span>
+      <span class="sub-title">OPERATIONS RESEARCH TOOL</span>
+    </div>
+
+    <span class="spacer" style="flex: 1"></span>
+
+    <!-- Solution Found badge — shown when solved -->
+    @if (isSolved) {
+      <div class="solution-badge">
+        <span class="badge-dot"></span>
+        SOLUTION FOUND
+      </div>
+    }
+  </mat-toolbar>
+
+  <div class="config-bar">
+    <div class="config-item">
+      <label>VARIABLES (N)</label>
+      <div class="custom-stepper">
+        <button (click)="onNChange(-1)" class="step-btn down">
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <input type="number" [value]="n" readonly class="stepper-input" />
+        <button (click)="onNChange(1)" class="step-btn up">
+          <mat-icon>expand_less</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="v-divider"></div>
+
+    <div class="config-item">
+      <label>CONSTRAINTS (M)</label>
+      <div class="custom-stepper">
+        <button (click)="onMChange(-1)" class="step-btn down">
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <input type="number" [value]="m" readonly class="stepper-input" />
+        <button (click)="onMChange(1)" class="step-btn up">
+          <mat-icon>expand_less</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="v-divider"></div>
+
+    <div class="config-item">
+      <label>OBJECTIVE</label>
+      <mat-button-toggle-group [value]="objective" (change)="onObjectiveChange($event.value)">
+        <mat-button-toggle value="MAXIMIZE">MAXIMIZE</mat-button-toggle>
+        <mat-button-toggle value="MINIMIZE">MINIMIZE</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <span class="spacer"></span>
+
+    <button mat-stroked-button class="reset-btn" (click)="reset()">
+      <mat-icon>refresh</mat-icon> Reset
+    </button>
+  </div>
+</div>
+
+<div class="main-content">
+  <mat-tab-group
+    [selectedIndex]="selectedTabIndex"
+    (selectedIndexChange)="onTabChange($event)"
+    animationDuration="300ms"
+    class="main-tabs"
+  >
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">table_chart</mat-icon>
+        <span>MODEL SETUP</span>
+      </ng-template>
+      <div class="tab-container">
+        <app-input-component
+          [n]="n"
+          [m]="m"
+          [objective]="objective"
+          (solved)="selectedTabIndex = 1"
+        >
+        </app-input-component>
+      </div>
+    </mat-tab>
+
+    <mat-tab [disabled]="!isSolved">
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">timeline</mat-icon>
+        <span>STEPS</span>
+        <span class="tab-badge" *ngIf="isSolved"></span>
+      </ng-template>
+      <div class="tab-container">
+        <app-steps-component></app-steps-component>
+      </div>
+    </mat-tab>
+
+    <mat-tab [disabled]="!isSolved">
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">emoji_events</mat-icon>
+        <span>OPTIMAL SOLUTION</span>
+      </ng-template>
+      <div class="tab-container">
+        <app-solution-component></app-solution-component>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

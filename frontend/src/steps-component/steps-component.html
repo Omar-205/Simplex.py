@@ -1,0 +1,144 @@
+<div class="steps-page">
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <div class="steps-header">
+    <h2 class="steps-title">ITERATION TRACE</h2>
+    <div class="steps-legend">
+      <span class="legend-item pivot-col-l">Pivot Col</span>
+      <span class="legend-dot"></span>
+      <span class="legend-item pivot-row-l">Pivot Row</span>
+      <span class="legend-dot"></span>
+      <span class="legend-item pivot-el-l">Pivot Element</span>
+      <span class="steps-count">{{ totalSteps }} steps total</span>
+    </div>
+  </div>
+
+  <!-- ── Step Cards ─────────────────────────────────────────────────── -->
+  @for (snapshot of snapshots; track $index; let si = $index) {
+    <div class="step-card-wrapper">
+      <!-- Step Number Badge -->
+      <div class="step-badge" [class.optimal-badge-icon]="si === snapshots.length - 1">
+        @if (si === snapshots.length - 1) {
+          <mat-icon>check_circle</mat-icon>
+        }
+        @if (si !== snapshots.length - 1) {
+          <span>{{ si }}</span>
+        }
+      </div>
+
+      <!-- Card -->
+      <div
+        class="step-card"
+        [class.is-optimal]="si === snapshots.length - 1"
+        [class.is-initial]="si === 0"
+      >
+        <!-- Card header bar -->
+        <div class="step-card-header">
+          <span class="step-label">{{ si === 0 ? 'INITIAL TABLEAU' : 'ITERATION ' + si }}</span>
+          <div class="step-header-right">
+            @if (snapshot.entering && snapshot.leaving) {
+              <ng-container>
+                <span class="var-badge entering">{{ snapshot.entering }} enters</span>
+                <span class="arrow-text">→</span>
+                <span class="var-badge leaving">{{ snapshot.leaving }} leaves</span>
+              </ng-container>
+            }
+
+            @if (si === snapshots.length - 1) {
+              <span class="optimal-badge">OPTIMAL</span>
+            }
+          </div>
+        </div>
+
+        <!-- Tableau + Analysis side by side -->
+        <div class="step-body">
+          <!-- Tableau -->
+          <div class="tableau-wrapper">
+            <table class="tableau-table">
+              <thead>
+                <tr>
+                  <!-- BASIS header -->
+                  <th class="basis-header">BASIS</th>
+                  <!-- Variable + RHS headers (skip index 0 which is 'BASIS') -->
+                  <th
+                    *ngFor="let h of snapshot.tableau.headers.slice(1); let hi = index"
+                    [class.rhs-header]="hi === snapshot.tableau.headers.length - 2"
+                  >
+                    {{ h }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let row of snapshot.tableau.rows; let ri = index"
+                  [class.z-row-tr]="row.isZRow"
+                  [class.pivot-row-tr]="row.isPivotRow && !row.isZRow"
+                >
+                  <!-- Basis label cell -->
+                  <td class="basis-cell" [class.entering-basis]="row.basis === snapshot.entering">
+                    {{ row.basis }}
+                  </td>
+
+                  <!-- Value cells -->
+                  <td
+                    *ngFor="let v of row.values; let vi = index"
+                    [ngClass]="getCellClass(snapshot, ri, vi)"
+                    [class.negative-val]="v < -1e-9"
+                  >
+                    {{ formatValue(v) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Analysis panel -->
+          <div class="analysis-panel">
+            <div class="analysis-title">STEP ANALYSIS</div>
+            <p class="analysis-text">{{ snapshot.analysis }}</p>
+
+            <div class="analysis-details" *ngIf="snapshot.entering">
+              <div class="detail-row">
+                <span class="detail-dot entering-dot"></span>
+                <span class="detail-label">Entering:</span>
+                <span class="detail-value">{{ snapshot.entering }}</span>
+              </div>
+              <div class="detail-row" *ngIf="snapshot.leaving">
+                <span class="detail-dot leaving-dot"></span>
+                <span class="detail-label">Leaving:</span>
+                <span class="detail-value">{{ snapshot.leaving }}</span>
+              </div>
+              <div class="detail-row" *ngIf="snapshot.pivot !== undefined">
+                <span class="detail-dot pivot-dot"></span>
+                <span class="detail-label">Pivot:</span>
+                <span class="detail-value">{{ snapshot.pivot }}</span>
+              </div>
+            </div>
+
+            <div class="current-z">
+              <span class="z-label">Current Z:</span>
+              <span
+                class="z-value"
+                [class.z-positive]="snapshot.currentZ > 0"
+                [class.z-negative]="snapshot.currentZ < 0"
+              >
+                {{ formatValue(snapshot.currentZ) }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- /.step-body -->
+      </div>
+      <!-- /.step-card -->
+    </div>
+  }
+
+  <!-- /.step-card-wrapper -->
+
+  <!-- Empty state -->
+  @if (snapshots.length === 0) {
+    <div class="empty-state">
+      <mat-icon>timeline</mat-icon>
+      <p>No solution trace yet. Set up a problem and click Solve.</p>
+    </div>
+  }
+</div>

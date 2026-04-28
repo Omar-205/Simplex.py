@@ -1,0 +1,122 @@
+<div class="solution-page">
+  <!-- ── Status Banner ──────────────────────────────────────────────── -->
+  @if (result) {
+    <div
+      class="status-banner"
+      [class.optimal]="isOptimal"
+      [class.infeasible]="isInfeasible"
+      [class.unbounded]="isUnbounded"
+    >
+      <div class="banner-inner">
+        <div class="banner-icon-wrap">
+          <mat-icon>{{
+            isOptimal ? 'check_circle' : isInfeasible ? 'cancel' : 'all_inclusive'
+          }}</mat-icon>
+        </div>
+        <div class="banner-text">
+          <div class="banner-title">
+            {{
+              isOptimal
+                ? 'Optimal Solution Found'
+                : isInfeasible
+                  ? 'Problem is Infeasible'
+                  : 'Problem is Unbounded'
+            }}
+          </div>
+          @if (isOptimal) {
+            <div class="banner-sub">Converged in {{ iterationsCount }} iterations</div>
+          }
+          @if (isInfeasible) {
+            <div class="banner-sub">No feasible solution exists</div>
+          }
+          @if (isUnbounded) {
+            <div class="banner-sub">The objective function has no finite optimal value</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Optimal Value + Decision Variables ─────────────────────────── -->
+  @if (isOptimal) {
+    <div class="solution-table-section">
+      <div class="section-title">SOLUTION SUMMARY</div>
+      <div class="solution-table-card">
+        <table class="solution-table">
+          <thead>
+            <tr>
+              <th class="col-var">VARIABLE</th>
+              <th class="col-val">OPTIMAL VALUE</th>
+              <th class="col-status">STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Decision variables -->
+            <tr *ngFor="let v of decisionVars" class="var-row">
+              <td class="var-name-cell">
+                {{ v.name }}
+              </td>
+              <td class="val-cell">{{ formatVal(v.value) }}</td>
+              <td class="status-cell">
+                <span class="status-badge" [class.basic]="v.isBasic" [class.non-basic]="!v.isBasic">
+                  {{ v.isBasic ? 'Basic' : 'Non-basic' }}
+                </span>
+              </td>
+            </tr>
+
+            <!-- Slack variables -->
+            <tr *ngFor="let s of slackVars" class="slack-row">
+              <td class="var-name-cell slack-name">{{ s.name }}</td>
+              <td class="val-cell">{{ formatVal(s.value) }}</td>
+              <td class="status-cell">
+                <span class="status-badge" [class.basic]="s.isBasic" [class.non-basic]="!s.isBasic">
+                  {{ s.isBasic ? 'Basic' : 'Non-basic' }}
+                </span>
+              </td>
+            </tr>
+
+            <!-- Z row -->
+            <tr class="z-summary-row">
+              <td class="var-name-cell z-label">
+                <span class="z-indicator"></span>
+                Z (Objective)
+              </td>
+              <td class="val-cell z-val">{{ formatVal(objectiveValue) }}</td>
+              <td class="status-cell">
+                <span class="status-badge optimal-badge">Optimal</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Solution Representation ─────────────────────────────────────── -->
+    <div class="representation-section" *ngIf="isOptimal">
+      <div class="section-title">SOLUTION REPRESENTATION</div>
+      <div class="repr-card">
+        <div class="repr-code">
+          <div class="repr-line">
+            <span class="repr-keyword">Optimal Solution:</span>
+          </div>
+          <div class="repr-line">
+            <span class="repr-values">{{ solutionRepresentation }}</span>
+          </div>
+          <div class="repr-line z-star-line">
+            <span class="z-star-text">Z* = {{ formatVal(objectiveValue) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Solution Summary Table ──────────────────────────────────────── -->
+
+  <!-- ── Empty / Error State ──────────────────────────────────────────── -->
+  @if (!result) {
+    <div class="empty-state">
+      <mat-icon>emoji_events</mat-icon>
+      <p>Solve a problem to see the optimal solution here.</p>
+    </div>
+  }
+</div>

@@ -1,0 +1,371 @@
+/* --- CSS Variables -------------------------------------------------------- */
+:root {
+  --primary: #7c3aed;
+  --primary-dark: #6d28d9;
+  --primary-light: #ede9fe;
+  --primary-muted: #f5f3ff;
+  --accent: #4c1d95;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+  --surface: #ffffff;
+  --surface-alt: #f9fafb;
+  --header-height: 112px;
+  --radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* --- Fixed Header --------------------------------------------------------- */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Title Bar ------------------------------------------------------------ */
+.title-bar {
+  height: 70px !important;
+  padding: 0 24px !important;
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 60%, #8b5cf6 100%) !important;
+  border-bottom: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-bar .logo-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: white !important;
+  margin-right: 10px;
+  opacity: 0.9;
+}
+
+.title-bar .title-container {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.title-bar .title-container .main-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.3px;
+}
+
+.title-bar .title-container .sub-title {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 1.2px;
+  margin-top: 2px;
+}
+
+/* Solution Found badge (top right of title bar) */
+.title-bar .solution-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 4px 14px 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.4px;
+}
+
+.title-bar .solution-badge .badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  flex-shrink: 0;
+}
+
+/* --- Config Bar ----------------------------------------------------------- */
+.config-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+  height: 60px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.config-bar .config-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 20px;
+}
+
+.config-bar .config-item label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* Violet square indicator before each config label */
+.config-bar .config-item label::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.config-bar .v-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.config-bar .spacer {
+  flex: 1;
+}
+
+/* --- Custom Stepper ------------------------------------------------------- */
+.custom-stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  height: 34px;
+}
+
+.custom-stepper .step-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 100%;
+  background: var(--surface-alt);
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+
+.custom-stepper .step-btn:hover {
+  background: var(--primary-muted);
+  color: var(--primary);
+}
+
+.custom-stepper .step-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.custom-stepper .stepper-input {
+  width: 40px;
+  height: 100%;
+  border: none;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--surface);
+  outline: none;
+}
+
+.custom-stepper .stepper-input::-webkit-inner-spin-button,
+.custom-stepper .stepper-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+/* --- Objective Toggle ----------------------------------------------------- */
+mat-button-toggle-group {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  overflow: hidden;
+  height: 34px;
+}
+
+mat-button-toggle {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+}
+
+mat-button-toggle.mat-button-toggle-checked {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+mat-button-toggle button {
+  height: 34px !important;
+  line-height: 34px !important;
+  padding: 0 14px !important;
+}
+
+/* --- Reset Button --------------------------------------------------------- */
+.reset-btn {
+  height: 34px !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-secondary) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px;
+}
+
+.reset-btn:hover {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  background: var(--primary-muted) !important;
+}
+
+.reset-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Main Content --------------------------------------------------------- */
+.main-content {
+  min-height: calc(100vh - var(--header-height));
+  margin-top: 150px;
+}
+
+.tab-container {
+  padding: 0;
+}
+
+/* --- Tab Styling ---------------------------------------------------------- */
+.main-tabs .mat-mdc-tab-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.main-tabs .mat-mdc-tab {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.6px !important;
+  color: var(--text-muted) !important;
+  opacity: 1 !important;
+  min-width: 160px !important;
+}
+
+.main-tabs .mat-mdc-tab.mat-mdc-tab-disabled {
+  opacity: 0.4 !important;
+}
+
+.main-tabs .mdc-tab--active .mdc-tab__text-label {
+  color: var(--primary) !important;
+}
+
+.main-tabs .mdc-tab-indicator__content--underline {
+  border-color: var(--primary) !important;
+  border-top-width: 2px !important;
+}
+
+.main-tabs .tab-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.main-tabs .mat-mdc-tab-body-wrapper {
+  background: var(--surface-alt);
+}
+
+/* Tab number badge (e.g. the "3" on TRACEABILITY) */
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  margin-left: 6px;
+  line-height: 1;
+}
+
+/* --- Shared Card ---------------------------------------------------------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Chip / Badge --------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.badge.badge-primary {
+  background: var(--primary-light);
+  color: var(--accent);
+}
+.badge.badge-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge.badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+.badge.badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.badge.badge-muted {
+  background: var(--border-light);
+  color: var(--text-muted);
+}
