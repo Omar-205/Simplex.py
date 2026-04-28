@@ -67,5 +67,6 @@ class Tableau:
     slack_start: int
     surplus_start: int
     art_start: int
+    objective: ObjectiveType
 
 

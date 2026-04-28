@@ -1,6 +1,6 @@
 import numpy as np
 
-from models.dtos import LPProblem, Operator, Tableau
+from models.dtos import LPProblem, ObjectiveType, Operator, Tableau
 
 
 def standardize(req: LPProblem):
@@ -62,7 +62,7 @@ def standardize(req: LPProblem):
         elif constraint.sign == Operator.GE:
             surplus_matrix[i, e] = -1
             art_matrix[i, a] = 1
-            var_names[surplus_start + e] = f"s{e+1}"
+            var_names[surplus_start + e] = f"e{e+1}"
             var_names[art_start + a] = f"a{a+1}"
             e += 1
             a += 1
@@ -82,11 +82,17 @@ def standardize(req: LPProblem):
     z = np.array(final_c, dtype=float)
     z = np.concatenate([z, np.zeros(num_additional)])
 
-
+    if(req.objective == ObjectiveType.MAX):
+        z = z * -1
+    z = np.append(z, 0)
+    """ print(z)
+    print(full_matrix[0]) """
+    assert len(z) == len(full_matrix[0])
     return Tableau(
         matrix=full_matrix,
         z=z,
         var_names=var_names,
         slack_start=slack_start,
         surplus_start=surplus_start,
-        art_start=art_start)
+        art_start=art_start,
+        objective=req.objective)

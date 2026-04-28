@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from core.simplex import solveProblem
 from core.standardization import standardize
 from models.dtos import LPProblem, SolveResponse, SolveStatus
 
@@ -18,10 +19,11 @@ async def solve(req: LPProblem):
     tableau = standardize(req)
 
     print(req)
-    print(tableau)
-
+    # print(tableau)
+    
     # mock response for frontend testing
-    return{
+    return solveProblem(tableau)
+    """ return{
     "status": "optimal",
     "solution": {"x1": 4, "x2": 0, "s1": 0, "s2": 2},
     "optimalValue": 12,
@@ -79,3 +81,4 @@ async def solve(req: LPProblem):
         }
     ]
 }
+"""
