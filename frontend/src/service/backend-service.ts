@@ -7,7 +7,7 @@ import { LpMapperService } from './lp-mapper-service';
 
 @Injectable({ providedIn: 'root' })
 export class LpStateService {
-  private readonly API_URL = 'http://localhost:8080/api/solve'; // TODO: update to real URL
+  private readonly API_URL = 'http://localhost:8000/solve'; // TODO: update to real URL
 
   private problemSubject = new BehaviorSubject<LpProblem>({
     n: 2,
@@ -52,9 +52,9 @@ export class LpStateService {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
 
-    const result = of(MOCK_BACKEND_RESPONSE);
+    // const result = of(MOCK_BACKEND_RESPONSE);
 
-    // const result = this.http.post<any>(this.API_URL, problem);
+    const result = this.http.post<any>(this.API_URL, problem);
 
     return result.pipe(
       map((raw) => this.mapper.mapSolveResponse(raw)),
