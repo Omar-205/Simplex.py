@@ -49,10 +49,9 @@ export class LpMapperService {
     };
   }
 
-  private mapSnapshot(raw: BackendSnapshot, index: number, total: number): Snapshot {
+  private mapSnapshot(raw: BackendSnapshot, index: number, total: number, ): Snapshot {
     const tableau = this.buildTableau(raw);
     const currentZ = raw.z[raw.z.length - 1]; // last entry of z-row is the RHS (objective value)
-
     return {
       tableau,
       currentZ,

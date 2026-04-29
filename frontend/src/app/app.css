@@ -108,6 +108,22 @@ body {
   flex-shrink: 0;
 }
 
+.badge-dot-error {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff0000;
+  flex-shrink: 0;
+}
+
+.badge-dot-warning {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+  flex-shrink: 0;
+}
+
 /* --- Config Bar ----------------------------------------------------------- */
 .config-bar {
   display: flex;
@@ -322,12 +338,27 @@ mat-button-toggle button {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--primary);
   color: white;
   font-size: 10px;
   font-weight: 800;
   margin-left: 6px;
   line-height: 1;
+}
+
+.tab-badge-blue {
+  background: var(--primary-dark);
+}
+
+.tab-badge-green {
+  background: var(--primary);
+}
+
+.tab-badge-red {
+  background: var(--danger);
+}
+
+.tab-badge-yellow {
+  background: var(--warning);
 }
 
 /* --- Shared Card ---------------------------------------------------------- */
