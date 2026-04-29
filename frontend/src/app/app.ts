@@ -10,6 +10,7 @@ import { InputComponent } from '../input-component/input-component';
 import { StepsComponent } from '../steps-component/steps-component';
 import { SolutionComponent } from '../solution-component/solution-component';
 import { LpStateService } from '../service/backend-service';
+import { SolveResponse } from '../models/model';
 
 @Component({
   selector: 'app-root',
@@ -30,12 +31,14 @@ import { LpStateService } from '../service/backend-service';
 })
 export class App {
   protected readonly title = signal('SimplexSolverUI');
+  result: SolveResponse | null = null;
   service = inject(LpStateService);
   n = 2;
   m = 2;
   objective: 'MAXIMIZE' | 'MINIMIZE' = 'MAXIMIZE';
-  isSolved = true;
+  solved = false;
   selectedTabIndex = 0;
+  solutionStatus = '';
 
   onNChange(delta: number) {
     const newN = Math.max(1, this.n + delta); // to prevent having a value less than 1
@@ -64,5 +67,21 @@ export class App {
 
   onTabChange(index: number) {
     this.selectedTabIndex = index;
+  }
+
+  onProblemSolved() {
+    console.log('Event received in Parent! Switching tabs...');
+    this.solved = true;
+    this.selectedTabIndex = 1; // Switch to steps tab
+    this.result = this.service.result;
+    this.solutionStatus = this.result?.status || '';
+  }
+  getBadgeClass(): string {
+    if (this.solutionStatus === 'unbounded') {
+      return 'tab-badge tab-badge-yellow';
+    } else if (this.solutionStatus === 'infeasible') {
+      return 'tab-badge tab-badge-red';
+    }
+    return 'tab-badge tab-badge-green';
   }
 }

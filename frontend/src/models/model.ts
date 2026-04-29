@@ -28,6 +28,7 @@ export interface Tableau {
 }
 
 export interface Snapshot {
+  label?: string;
   tableau: Tableau;
   analysis: string;
   entering?: string;
@@ -39,7 +40,7 @@ export interface Snapshot {
 export interface SolveResponse {
   status: 'optimal' | 'infeasible' | 'unbounded';
   snapshots: Snapshot[];
-
+  isTwoPhase?: boolean;
   optimalValue: number;
   solution: { [key: string]: number };
 }

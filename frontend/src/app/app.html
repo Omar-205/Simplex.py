@@ -9,10 +9,18 @@
     <span class="spacer" style="flex: 1"></span>
 
     <!-- Solution Found badge — shown when solved -->
-    @if (isSolved) {
+    @if (solved) {
       <div class="solution-badge">
-        <span class="badge-dot"></span>
-        SOLUTION FOUND
+        <span
+          [class]="
+            solutionStatus === 'unbounded'
+              ? 'badge-dot-warning'
+              : solutionStatus === 'infeasible'
+                ? 'badge-dot-error'
+                : 'badge-dot'
+          "
+        ></span>
+        {{ solutionStatus || 'SOLUTION FOUND' }}
       </div>
     }
   </mat-toolbar>
@@ -77,28 +85,23 @@
         <span>MODEL SETUP</span>
       </ng-template>
       <div class="tab-container">
-        <app-input-component
-          [n]="n"
-          [m]="m"
-          [objective]="objective"
-          (solved)="selectedTabIndex = 1"
-        >
+        <app-input-component [n]="n" [m]="m" [objective]="objective" (solved)="onProblemSolved()">
         </app-input-component>
       </div>
     </mat-tab>
 
-    <mat-tab [disabled]="!isSolved">
+    <mat-tab [disabled]="!solved">
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">timeline</mat-icon>
         <span>STEPS</span>
-        <span class="tab-badge" *ngIf="isSolved"></span>
+        <span [ngClass]="getBadgeClass()"></span>
       </ng-template>
       <div class="tab-container">
         <app-steps-component></app-steps-component>
       </div>
     </mat-tab>
 
-    <mat-tab [disabled]="!isSolved">
+    <mat-tab [disabled]="!solved">
       <ng-template mat-tab-label>
         <mat-icon class="tab-icon">emoji_events</mat-icon>
         <span>OPTIMAL SOLUTION</span>

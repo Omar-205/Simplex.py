@@ -33,7 +33,7 @@
       >
         <!-- Card header bar -->
         <div class="step-card-header">
-          <span class="step-label">{{ si === 0 ? 'INITIAL TABLEAU' : 'ITERATION ' + si }}</span>
+          <span class="step-label">{{ snapshot.label }}</span>
           <div class="step-header-right">
             @if (snapshot.entering && snapshot.leaving) {
               <ng-container>
@@ -112,17 +112,6 @@
                 <span class="detail-label">Pivot:</span>
                 <span class="detail-value">{{ snapshot.pivot }}</span>
               </div>
-            </div>
-
-            <div class="current-z">
-              <span class="z-label">Current Z:</span>
-              <span
-                class="z-value"
-                [class.z-positive]="snapshot.currentZ > 0"
-                [class.z-negative]="snapshot.currentZ < 0"
-              >
-                {{ formatValue(snapshot.currentZ) }}
-              </span>
             </div>
           </div>
         </div>
