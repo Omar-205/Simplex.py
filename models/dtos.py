@@ -43,6 +43,7 @@ class Snapshot(BaseModel):
     leavingVar: Optional[str]
 
     basicVars: List[str]
+    phase: Optional[int] = None
 
 class SolveStatus(str, Enum):
     OPTIMAL = "optimal"

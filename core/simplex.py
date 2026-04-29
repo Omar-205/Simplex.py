@@ -208,7 +208,8 @@ def solveProblem(tableau: Tableau):
             rowIdx=None,
             pivot=None,
             enteringVar=None,
-            leavingVar=None
+            leavingVar=None,
+            phase=2
         ))
     else :
         print('need 2 phase')
@@ -238,7 +239,8 @@ def solveProblem(tableau: Tableau):
             rowIdx=None,
             pivot=None,
             enteringVar=None,
-            leavingVar=None
+            leavingVar=None,
+            phase=1
         ))
         # minimize the w row
         solved, snapshots2 = maximize(tableau=tableau)
@@ -285,7 +287,8 @@ def solveProblem(tableau: Tableau):
             rowIdx=None,
             pivot=None,
             enteringVar=None,
-            leavingVar=None
+            leavingVar=None,
+            phase=2
         ))
     z = tableau.z
 
