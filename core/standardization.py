@@ -2,6 +2,13 @@ import numpy as np
 
 from models.dtos import LPProblem, ObjectiveType, Operator, Tableau
 
+def flip(sign: Operator):
+    if sign == Operator.LE:
+        return Operator.GE
+    elif sign == Operator.GE:
+        return Operator.LE
+    else:
+        return Operator.EQ
 
 def standardize(req: LPProblem):
 
@@ -33,7 +40,13 @@ def standardize(req: LPProblem):
         rows.append(row)
         rhs_vector.append(constraint.rhs)
 
-    # 2- add slack/ surplus/ artificial vars
+    # 2- handel neg b
+    for i, b in enumerate(rhs_vector):
+        if b < 0:
+            rows[i] = [-x for x in rows[i]]
+            rhs_vector[i] *= -1
+            req.constraints[i].sign = flip(req.constraints[i].sign)
+    # 3- add slack/ surplus/ artificial vars
     num_constraints = len(req.constraints)
     n = len(final_c)
     num_slack = sum(c.sign == Operator.LE for c in req.constraints)
