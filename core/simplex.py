@@ -8,12 +8,13 @@ from .standardization import standardize
 from models.dtos import Constraint, LPProblem, Tableau, Operator, ObjectiveType, Optional, Snapshot, SolveStatus, SolveResponse
 
 def maximize(  tableau: Tableau):
+    print(tableau.basic_vars)
     constrains: NDArray = tableau.matrix
     z: NDArray = tableau.z
     snapshots = []
-    snapshots.append(Snapshot(matrix=constrains.tolist(), z=z.tolist(), varMap=tableau.var_names, slackStart=tableau.slack_start
-                              , surplusStart=tableau.surplus_start, artStart=tableau.art_start, basicVars=tableau.var_names[:tableau.slack_start]
-                              ,colIdx=None, rowIdx=None, pivot=None, enteringVar=None, leavingVar=None))
+    # snapshots.append(Snapshot(matrix=constrains.tolist(), z=z.tolist(), varMap=tableau.var_names, slackStart=tableau.slack_start
+    #                           , surplusStart=tableau.surplus_start, artStart=tableau.art_start, basicVars=tableau.basic_vars
+    #                           ,colIdx=None, rowIdx=None, pivot=None, enteringVar=None, leavingVar=None))
     def reachedOptimal(a: NDArray):
         return a[0:len(a)-1].min() >= 0
     while not reachedOptimal(z):
@@ -56,14 +57,14 @@ def maximize(  tableau: Tableau):
                 leavingVarN = tableau.var_names[i] 
                 print(f"leaving var is {leavingVarN}")
         # getting the names of the basic variables
-        basicVars = []
-    
-        for i in range(len(z) - 1):
-            if(isBasic(i, constrains, z)):
-                basicVars.append(tableau.var_names[i])
+        # basicVars = []
+        #
+        # for i in range(len(z) - 1):
+        #     if(isBasic(i, constrains, z)):
+        #         basicVars.append(tableau.var_names[i])
         snapshots.append(Snapshot(matrix=constrains.tolist(), z=z.tolist()
                               ,varMap=tableau.var_names, slackStart=tableau.slack_start
-                              , surplusStart=tableau.surplus_start, artStart=tableau.art_start, basicVars=basicVars
+                              , surplusStart=tableau.surplus_start, artStart=tableau.art_start, basicVars=tableau.basic_vars
                               ,colIdx=entering, rowIdx=leaving, pivot=constrains[leaving][entering], enteringVar=tableau.var_names[entering], leavingVar=leavingVarN))
         # the pivot
         constrains[leaving] = constrains[leaving] / constrains[leaving][entering]
@@ -77,8 +78,14 @@ def maximize(  tableau: Tableau):
         m = z[entering]
         for i in range(len(z)):
             z[i] = z[i] - m * constrains[leaving][i]
-        
-        
+
+        tableau.basic_vars[leaving] = tableau.var_names[entering]
+
+    snapshots.append(Snapshot(matrix=constrains.tolist(), z=z.tolist()
+                              , varMap=tableau.var_names, slackStart=tableau.slack_start
+                              , surplusStart=tableau.surplus_start, artStart=tableau.art_start, basicVars=tableau.basic_vars
+                              , colIdx=None, rowIdx=None, pivot=None,
+                              enteringVar=None, leavingVar=None))
             
         
     print("optimal now")
@@ -189,6 +196,21 @@ def solveProblem(tableau: Tableau):
     if(tableau.art_start == len(tableau.z) - 1):
         #no need for 2 phase
         print('no need for 2 phase')
+        snapshots.append(Snapshot(
+            matrix=tableau.matrix.tolist(),
+            z=tableau.z.tolist(),
+            varMap=tableau.var_names,
+            slackStart=tableau.slack_start,
+            surplusStart=tableau.surplus_start,
+            artStart=tableau.art_start,
+            basicVars=tableau.basic_vars,
+            colIdx=None,
+            rowIdx=None,
+            pivot=None,
+            enteringVar=None,
+            leavingVar=None,
+            phase=2
+        ))
     else :
         print('need 2 phase')
         # store the original z
@@ -204,6 +226,22 @@ def solveProblem(tableau: Tableau):
                 if(constr[i] == 1):
                     tableau.z = tableau.z - constr
                     break
+
+        snapshots.append(Snapshot(
+            matrix=tableau.matrix.tolist(),
+            z=w.tolist(),
+            varMap=tableau.var_names,
+            slackStart=tableau.slack_start,
+            surplusStart=tableau.surplus_start,
+            artStart=tableau.art_start,
+            basicVars=tableau.basic_vars,
+            colIdx=None,
+            rowIdx=None,
+            pivot=None,
+            enteringVar=None,
+            leavingVar=None,
+            phase=1
+        ))
         # minimize the w row
         solved, snapshots2 = maximize(tableau=tableau)
         for s in snapshots2:
@@ -215,6 +253,14 @@ def solveProblem(tableau: Tableau):
             return SolveResponse(optimalValue=None, snapshots=snapshots, solution={}, status=SolveStatus.INFEASIBLE)
         # return the original z row
         tableau.z = z
+        print("Before")
+        print(tableau.z)
+        var_map = {name: i for i, name in enumerate(tableau.var_names)}
+        for i, name in enumerate(tableau.basic_vars):
+            row = tableau.matrix[i]
+            tableau.z = tableau.z - row * z[var_map[name]]
+        print("After")
+        print(tableau.z)
         # delete the artificial row
         aas = len(z) - art_start - 1
         for i in range(aas):
@@ -228,7 +274,24 @@ def solveProblem(tableau: Tableau):
             tableau.z = np.delete(tableau.z, d)
             tableau.var_names.__delitem__(d)
             tableau.art_start = len(z)-1
+
+        snapshots.append(Snapshot(
+            matrix=tableau.matrix.tolist(),
+            z=z.tolist(),
+            varMap=tableau.var_names,
+            slackStart=tableau.slack_start,
+            surplusStart=tableau.surplus_start,
+            artStart=tableau.art_start,
+            basicVars=tableau.basic_vars,
+            colIdx=None,
+            rowIdx=None,
+            pivot=None,
+            enteringVar=None,
+            leavingVar=None,
+            phase=2
+        ))
     z = tableau.z
+
     solved, snapshots2 = maximize(tableau=tableau)
     for s in snapshots2:
         snapshots.append(s)
@@ -272,17 +335,17 @@ Subject to:
                 # Constraint(coefficients=[1.0, 0], sign=Operator.LE, rhs=3),
                 ],
                 variableRestrictions=[False, True] ) """
-req = LPProblem(n=3, m=3, objective=ObjectiveType.MAX,
-                objectiveCoeffs=[2345678.0, 3456789.0, 1234567.0],
-                constraints=[
-                    Constraint(coefficients=[12345.0, 23456.0, 34567.0], sign=Operator.LE, rhs=1000000.0),
-                    Constraint(coefficients=[98765.0, 87654.0, 76543.0], sign=Operator.GE, rhs=500000.0),
-                    Constraint(coefficients=[11111.0, 22222.0, 33333.0], sign=Operator.LE, rhs=2000000.0)
-                ],
-                variableRestrictions=[True, True, True])
-#print(req)
-tableau = standardize(req)
-print(tableau)
-solveProblem(tableau)
+# req = LPProblem(n=3, m=3, objective=ObjectiveType.MAX,
+#                 objectiveCoeffs=[2345678.0, 3456789.0, 1234567.0],
+#                 constraints=[
+#                     Constraint(coefficients=[12345.0, 23456.0, 34567.0], sign=Operator.LE, rhs=1000000.0),
+#                     Constraint(coefficients=[98765.0, 87654.0, 76543.0], sign=Operator.GE, rhs=500000.0),
+#                     Constraint(coefficients=[11111.0, 22222.0, 33333.0], sign=Operator.LE, rhs=2000000.0)
+#                 ],
+#                 variableRestrictions=[True, True, True])
+# #print(req)
+# tableau = standardize(req)
+# print(tableau)
+# solveProblem(tableau)
 
 

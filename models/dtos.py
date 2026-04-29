@@ -43,6 +43,7 @@ class Snapshot(BaseModel):
     leavingVar: Optional[str]
 
     basicVars: List[str]
+    phase: Optional[int] = None
 
 class SolveStatus(str, Enum):
     OPTIMAL = "optimal"
@@ -63,10 +64,13 @@ class Tableau:
     z: NDArray
 
     var_names: List[str]
+    basic_vars: List[str]
 
     slack_start: int
     surplus_start: int
     art_start: int
     objective: ObjectiveType
+
+
 
 

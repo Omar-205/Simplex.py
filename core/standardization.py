@@ -2,6 +2,13 @@ import numpy as np
 
 from models.dtos import LPProblem, ObjectiveType, Operator, Tableau
 
+def flip(sign: Operator):
+    if sign == Operator.LE:
+        return Operator.GE
+    elif sign == Operator.GE:
+        return Operator.LE
+    else:
+        return Operator.EQ
 
 def standardize(req: LPProblem):
 
@@ -33,7 +40,13 @@ def standardize(req: LPProblem):
         rows.append(row)
         rhs_vector.append(constraint.rhs)
 
-    # 2- add slack/ surplus/ artificial vars
+    # 2- handel neg b
+    for i, b in enumerate(rhs_vector):
+        if b < 0:
+            rows[i] = [-x for x in rows[i]]
+            rhs_vector[i] *= -1
+            req.constraints[i].sign = flip(req.constraints[i].sign)
+    # 3- add slack/ surplus/ artificial vars
     num_constraints = len(req.constraints)
     n = len(final_c)
     num_slack = sum(c.sign == Operator.LE for c in req.constraints)
@@ -53,10 +66,13 @@ def standardize(req: LPProblem):
 
     s = e = a = 0
 
+    basic_vars = [""] * num_constraints
+
     for i, constraint in enumerate(req.constraints):
         if constraint.sign == Operator.LE:
             slack_matrix[i, s] = 1
             var_names[slack_start + s] = f"s{s+1}"
+            basic_vars[i] = f"s{s+1}"
             s += 1
 
         elif constraint.sign == Operator.GE:
@@ -64,6 +80,7 @@ def standardize(req: LPProblem):
             art_matrix[i, a] = 1
             var_names[surplus_start + e] = f"e{e+1}"
             var_names[art_start + a] = f"a{a+1}"
+            basic_vars[i] = f"a{a+1}"
             e += 1
             a += 1
 
@@ -71,6 +88,7 @@ def standardize(req: LPProblem):
         elif constraint.sign == Operator.EQ:
             art_matrix[i, a] = 1
             var_names[art_start + a] = f"a{a+1}"
+            basic_vars[i] = f"a{a+1}"
             a += 1
 
     var_names.append("b")
@@ -92,6 +110,7 @@ def standardize(req: LPProblem):
         matrix=full_matrix,
         z=z,
         var_names=var_names,
+        basic_vars=basic_vars,
         slack_start=slack_start,
         surplus_start=surplus_start,
         art_start=art_start,
