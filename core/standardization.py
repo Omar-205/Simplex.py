@@ -53,10 +53,13 @@ def standardize(req: LPProblem):
 
     s = e = a = 0
 
+    basic_vars = [""] * num_constraints
+
     for i, constraint in enumerate(req.constraints):
         if constraint.sign == Operator.LE:
             slack_matrix[i, s] = 1
             var_names[slack_start + s] = f"s{s+1}"
+            basic_vars[i] = f"s{s+1}"
             s += 1
 
         elif constraint.sign == Operator.GE:
@@ -64,6 +67,7 @@ def standardize(req: LPProblem):
             art_matrix[i, a] = 1
             var_names[surplus_start + e] = f"e{e+1}"
             var_names[art_start + a] = f"a{a+1}"
+            basic_vars[i] = f"a{a+1}"
             e += 1
             a += 1
 
@@ -71,6 +75,7 @@ def standardize(req: LPProblem):
         elif constraint.sign == Operator.EQ:
             art_matrix[i, a] = 1
             var_names[art_start + a] = f"a{a+1}"
+            basic_vars[i] = f"a{a+1}"
             a += 1
 
     var_names.append("b")
@@ -92,6 +97,7 @@ def standardize(req: LPProblem):
         matrix=full_matrix,
         z=z,
         var_names=var_names,
+        basic_vars=basic_vars,
         slack_start=slack_start,
         surplus_start=surplus_start,
         art_start=art_start,
