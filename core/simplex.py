@@ -7,6 +7,59 @@ from numpy.typing import NDArray
 from .standardization import standardize
 from models.dtos import Constraint, LPProblem, Tableau, Operator, ObjectiveType, Optional, Snapshot, SolveStatus, SolveResponse
 
+def lex_compare(v1: NDArray, v2: NDArray, tol: float = 1e-10) -> int:
+    """
+    Lexicographic comparison of two vectors.
+    Returns: -1 if v1 < v2, 0 if equal (within tolerance), 1 if v1 > v2
+    """
+    for x, y in zip(v1, v2):
+        diff = x - y
+        if abs(diff) < tol:
+            continue
+        return -1 if diff < 0 else 1
+    return 0
+
+
+def find_leaving_var_lex(constrains: NDArray, entering: int) -> tuple:
+    """
+    Find leaving variable using lexicographic method to prevent cycling.
+    Returns: (leaving_row_index, min_ratio)
+    """
+    leaving = -1
+    min_ratio_vector = None
+    min_ratio = 1e18
+
+    for i, row in enumerate(constrains):
+        if row[entering] <= 0:
+            continue
+
+        # Compute ratio vector by dividing row by pivot element
+        ratio_vector = row / row[entering]
+        curr_ratio = ratio_vector[len(row) - 1]  # RHS ratio
+
+        if leaving == -1:
+            leaving = i
+            min_ratio_vector = ratio_vector
+            min_ratio = curr_ratio
+        else:
+            # Compare RHS first, then lexicographically if equal
+            if min_ratio < curr_ratio - 1e-10:
+                # Current min is strictly better
+                pass
+            elif abs(min_ratio - curr_ratio) < 1e-10:
+                # RHS ratios are equal - compare lexicographically
+                if lex_compare(ratio_vector, min_ratio_vector) < 0:
+                    leaving = i
+                    min_ratio_vector = ratio_vector
+                    min_ratio = curr_ratio
+            else:
+                # This row's ratio is better
+                leaving = i
+                min_ratio_vector = ratio_vector
+                min_ratio = curr_ratio
+
+    return leaving, min_ratio
+
 def maximize(  tableau: Tableau):
     print(tableau.basic_vars)
     constrains: NDArray = tableau.matrix
@@ -19,7 +72,7 @@ def maximize(  tableau: Tableau):
         return a[0:len(a)-1].min() >= 0
     while not reachedOptimal(z):
         # finding the entering variable (col)
-        print("still not oprimal")
+        print("still not optimal")
         print("rows:")
         for row in constrains:
             print(row)
@@ -31,37 +84,28 @@ def maximize(  tableau: Tableau):
                 entering = i
         print(f"entering: col {entering}")
         # finding the leaving variable (row) if it exists
-        leaving = -1
-        minRatio = 1e18
-        for i, row in enumerate(constrains):
-            if row[entering] <= 0:
-                continue
-            rowRatio = row[len(row) - 1] / row[entering] #ratio test
-            if rowRatio < minRatio:
-                minRatio = rowRatio
-                leaving = i
+        leaving, minRatio = find_leaving_var_lex(constrains, entering)
+        # leaving = -1
+        # minRatio = 1e18
+        # for i, row in enumerate(constrains):
+        #     if row[entering] <= 0:
+        #         continue
+        #     rowRatio = row[len(row) - 1] / row[entering] #ratio test
+        #     if rowRatio < 0:
+        #         continue
+        #     if rowRatio < minRatio:
+        #         minRatio = rowRatio
+        #         leaving = i
+            # elif rowRatio == minRatio:
+            #     if tableau.var_names.index(tableau.basic_vars[i]) < tableau.var_names.index(
+            #             tableau.basic_vars[leaving]):
+            #         leaving = i
         # no +ve ratios
         if(leaving == -1):
             print('unbounded')
             return False, snapshots
         print(f"leaving: row {leaving}, entering: col {entering}")
-        #getting the name of the leaving variable
-        leavingVarN = ''
-        for i, v in enumerate(constrains[leaving]):
-            if(v == 1 and z[i] == 0):
-                might = True
-                for j, constr in enumerate(constrains):
-                    if(j == leaving): continue
-                    if(constr[i]!=0): might = False
-                if(not might): continue
-                leavingVarN = tableau.var_names[i] 
-                print(f"leaving var is {leavingVarN}")
-        # getting the names of the basic variables
-        # basicVars = []
-        #
-        # for i in range(len(z) - 1):
-        #     if(isBasic(i, constrains, z)):
-        #         basicVars.append(tableau.var_names[i])
+        leavingVarN = tableau.basic_vars[leaving]
         snapshots.append(Snapshot(matrix=constrains.tolist(), z=z.tolist()
                               ,varMap=tableau.var_names, slackStart=tableau.slack_start
                               , surplusStart=tableau.surplus_start, artStart=tableau.art_start, basicVars=tableau.basic_vars
@@ -72,7 +116,7 @@ def maximize(  tableau: Tableau):
         for i, row in enumerate(constrains):
             if(i == leaving):
                 continue
-            m = row[entering] 
+            m = row[entering]
             constrains[i] =  row - m * constrains[leaving]
         # updating the z-row
         m = z[entering]
@@ -86,8 +130,8 @@ def maximize(  tableau: Tableau):
                               , surplusStart=tableau.surplus_start, artStart=tableau.art_start, basicVars=tableau.basic_vars
                               , colIdx=None, rowIdx=None, pivot=None,
                               enteringVar=None, leavingVar=None))
-            
-        
+
+
     print("optimal now")
     print("rows:")
     for row in constrains:
