@@ -28,13 +28,14 @@ export interface Tableau {
 }
 
 export interface Snapshot {
-  label?: string;
   tableau: Tableau;
   analysis: string;
   entering?: string;
   leaving?: string;
   pivot?: number;
   currentZ: number;
+  isPhaseStart?: boolean;
+  phase?: number;
 }
 
 export interface SolveResponse {

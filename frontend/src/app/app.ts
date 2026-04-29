@@ -72,7 +72,9 @@ export class App {
   onProblemSolved() {
     console.log('Event received in Parent! Switching tabs...');
     this.solved = true;
-    this.selectedTabIndex = 1; // Switch to steps tab
+    if (this.result?.status == 'optimal')
+      this.selectedTabIndex = 1; // Switch to steps tab
+    else this.selectedTabIndex = 2; // Switch to solution tab for infeasible/unbounded cases
     this.result = this.service.result;
     this.solutionStatus = this.result?.status || '';
   }

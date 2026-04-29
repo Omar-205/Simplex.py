@@ -64,4 +64,34 @@ export class StepsComponent implements OnInit {
     if (Number.isInteger(v)) return v.toString();
     return +v.toFixed(4) + '';
   }
+  get isMultiPhase(): boolean {
+    const phases = new Set(this.snapshots.filter((s) => s.phase != null).map((s) => s.phase));
+    return phases.size > 1;
+  }
+  get isOptimal(): boolean {
+    return this.result?.status === 'optimal';
+  }
+  getStepLabel(snapshot: Snapshot, si: number): string {
+    // Find this snapshot's phase-start index
+    let phaseStartIdx = 0;
+    for (let i = si; i >= 0; i--) {
+      if (this.snapshots[i].isPhaseStart) {
+        phaseStartIdx = i;
+        break;
+      }
+    }
+    const iterNumWithinPhase = si - phaseStartIdx;
+    const currentPhase = this.snapshots[phaseStartIdx].phase;
+    const isLast = si === this.snapshots.length - 1;
+    const phasePrefix =
+      this.isMultiPhase && currentPhase != null ? `PHASE ${currentPhase} \u2014 ` : '';
+
+    if (snapshot.isPhaseStart) {
+      return `${phasePrefix}INITIAL TABLEAU`;
+    }
+    if (isLast && !snapshot.entering) {
+      return `${phasePrefix}OPTIMAL TABLEAU`;
+    }
+    return `${phasePrefix}ITERATION ${iterNumWithinPhase}`;
+  }
 }

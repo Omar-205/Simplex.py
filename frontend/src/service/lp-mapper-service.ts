@@ -41,36 +41,29 @@ interface BackendSolveResponse {
 
 @Injectable({ providedIn: 'root' })
 export class LpMapperService {
-  isTwoPhase: boolean = true;
-  currentPhase: 1 | 2 = 1;
-
   mapSolveResponse(raw: BackendSolveResponse): SolveResponse {
     return {
       status: raw.status,
       optimalValue: raw.optimalValue ?? 0,
       solution: raw.solution ?? {},
       snapshots: raw.snapshots.map((s, i) => this.mapSnapshot(s, i, raw.snapshots.length)),
-      isTwoPhase: this.isTwoPhase,
     };
   }
 
   private mapSnapshot(raw: BackendSnapshot, index: number, total: number): Snapshot {
-    if (index === 0 && raw.phase === 2) this.isTwoPhase = false; // if first snapshot is from phase 2, then it's not a two-phase problem
-    if (index > 0 && raw.phase == 2 && this.isTwoPhase) {
-      this.currentPhase = 2;
-    }
-
     const tableau = this.buildTableau(raw);
     const currentZ = raw.z[raw.z.length - 1]; // last entry of z-row is the RHS (objective value)
+    const isPhaseStart = raw.phase != null;
     return {
-      label: this.formLabel(index),
       tableau,
       currentZ,
       entering: raw.enteringVar ?? undefined,
       leaving: raw.leavingVar ?? undefined,
       pivot: raw.pivot ?? undefined,
+      phase: raw.phase ?? undefined,
       // analysis: this.deriveAnalysis(raw, index, total, currentZ),
       analysis: '',
+      isPhaseStart,
     };
   }
   private buildTableau(raw: BackendSnapshot): Tableau {
@@ -130,11 +123,4 @@ export class LpMapperService {
 
   //   return `Iteration ${index}.`;
   // }
-
-  formLabel(index: number): string {
-    if (index === 0) {
-      return this.isTwoPhase ? `Initial Tableau - Phase ${this.currentPhase}` : 'Initial Tableau';
-    }
-    return `Iteration ${index + 1} - Phase ${this.currentPhase}`;
-  }
 }

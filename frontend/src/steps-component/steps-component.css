@@ -533,3 +533,24 @@
 .steps-page .empty-state p {
   font-size: 14px;
 }
+
+.steps-page .step-badge.warning-badge-icon {
+  background: var(--danger); /* red for infeasible */
+}
+
+/* override to amber for unbounded specifically if you want */
+
+.steps-page .step-card.is-not-optimal {
+  border-color: var(--danger);
+  box-shadow:
+    0 0 0 1px var(--danger),
+    var(--shadow-sm);
+}
+
+.steps-page .step-card.is-not-optimal .step-card-header {
+  background: #fee2e2;
+}
+
+.steps-page .step-card-header .optimal-badge.not-optimal-badge {
+  background: var(--danger);
+}
