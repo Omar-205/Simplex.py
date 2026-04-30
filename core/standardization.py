@@ -114,4 +114,6 @@ def standardize(req: LPProblem):
         slack_start=slack_start,
         surplus_start=surplus_start,
         art_start=art_start,
-        objective=req.objective)
+        objective=req.objective,
+        variable_restrictions=req.variableRestrictions,
+    )

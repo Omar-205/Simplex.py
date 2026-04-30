@@ -8,10 +8,9 @@ from .standardization import standardize
 from models.dtos import Constraint, LPProblem, Tableau, Operator, ObjectiveType, Optional, Snapshot, SolveStatus, SolveResponse
 
 def lex_compare(v1: NDArray, v2: NDArray, tol: float = 1e-10) -> int:
-    """
-    Lexicographic comparison of two vectors.
-    Returns: -1 if v1 < v2, 0 if equal (within tolerance), 1 if v1 > v2
-    """
+
+    # Returns: -1 if v1 < v2, 0 if equal (within tolerance), 1 if v1 > v2
+
     for x, y in zip(v1, v2):
         diff = x - y
         if abs(diff) < tol:
@@ -21,10 +20,6 @@ def lex_compare(v1: NDArray, v2: NDArray, tol: float = 1e-10) -> int:
 
 
 def find_leaving_var_lex(constrains: NDArray, entering: int) -> tuple:
-    """
-    Find leaving variable using lexicographic method to prevent cycling.
-    Returns: (leaving_row_index, min_ratio)
-    """
     leaving = -1
     min_ratio_vector = None
     min_ratio = 1e18
@@ -160,81 +155,45 @@ def valueOf(i: int, constrains, z)->float:
         return 0
     nonZ =[]
     for constrain in constrains:
-        if(constrain[i] != 0 and constrain[i] != 1 and constrain[i] != -1):
+        # if(constrain[i] != 0 and constrain[i] != 1 and constrain[i] != -1):
+        if (constrain[i] != 0 and constrain[i] != 1):
             return 0
         if (constrain[i] != 0):
             nonZ.append(constrain)
     if(len(nonZ) != 1):
         return 0
     constrain = nonZ[0]
-    return constrain[i] * constrain[len(constrain) - 1]
-
-""" 
-class Operator(str, Enum):
-    LE = "<="
-    GE = ">="
-    EQ = "="
-
-class ObjectiveType(str, Enum):
-    MIN = "MINIMIZE"
-    MAX = "MAXIMIZE"
-
-class Constraint(BaseModel):
-    coefficients: List[float]
-    sign: Operator
-    rhs: float
-
-class LPProblem(BaseModel):
-    n: int
-    m: int
-    objective: ObjectiveType
-    objectiveCoeffs: List[float]
-    constraints: List[Constraint]
-    variableRestrictions: List[bool]
-
-class Snapshot(BaseModel):
-    matrix: List[List[float]]
-    z: List[float]
-
-    varMap: List[str]
-    slackStart: int
-    surplusStart: int
-    artStart: int
-
-    rowIdx: Optional[int] = None
-    colIdx: Optional[int] = None
-    pivot: Optional[float] = None
-
-    enteringVar: Optional[str]
-    leavingVar: Optional[str]
-
-    basicVars: List[str]
-
-class SolveStatus(str, Enum):
-    OPTIMAL = "optimal"
-    UNBOUNDED = "unbounded"
-    INFEASIBLE = "infeasible"
-
-class SolveResponse(BaseModel):
-    status: SolveStatus
-    snapshots: List[Snapshot]
-
-    optimalValue: Optional[float] = None
-    solution: Optional[dict[str, float]] = None
+    # return constrain[i] * constrain[len(constrain) - 1]
+    return constrain[len(constrain) - 1]
 
 
-@dataclass
-class Tableau:
-    matrix: NDArray
-    z: NDArray
+def merge_unrestricted_vars(solution: dict, var_restrictions: list[bool]) -> dict:
+    if var_restrictions is None:
+        return solution
+    merged = {}
+    for i, is_restricted in enumerate(var_restrictions):
+        var_name = f"x{i+1}"
+        if is_restricted:
+            if var_name in solution:
+                merged[var_name] = solution[var_name]
+        else:
+            print("here")
+            pos_name = f"x{i+1}_pos"
+            neg_name = f"x{i+1}_neg"
+            pos_val = solution.get(pos_name, 0)
+            neg_val = solution.get(neg_name, 0)
+            print(pos_val, neg_val)
+            merged[var_name] = pos_val - neg_val
 
-    var_names: List[str]
+        print(merged)
 
-    slack_start: int
-    surplus_start: int
-    art_start: int
+    for var_name, val in solution.items():
+        if var_name.startswith(('s', 'e', 'a')):
+            merged[var_name] = val
 
-"""
+    return merged
+
+
 def solveProblem(tableau: Tableau):
     snapshots = []
     if(tableau.art_start == len(tableau.z) - 1):
@@ -316,6 +275,7 @@ def solveProblem(tableau: Tableau):
                 tableau.matrix[j] = np.delete(tableau.matrix[j], i) """
             tableau.matrix = np.delete(tableau.matrix, d, axis=1)
             tableau.z = np.delete(tableau.z, d)
+            z = np.delete(z, d)
             tableau.var_names.__delitem__(d)
             tableau.art_start = len(z)-1
 
@@ -350,46 +310,14 @@ def solveProblem(tableau: Tableau):
         for i in range(len(z)):
             solutions[varNames[i]] = valueOf(i, constrains=tableau.matrix, z=tableau.z)
         print(f"solutions: {solutions}")
+        solutions = merge_unrestricted_vars(solutions, tableau.variable_restrictions)
+        print(f"solutions: {solutions}")
         print(f"optimal solution: {tableau.z[(len(z)-1)]}")
         return SolveResponse(optimalValue=optimalValue, snapshots=snapshots, solution=solutions, status=SolveStatus.OPTIMAL)
     else :
         print("UNBOUNDED")
         return SolveResponse(optimalValue=None, snapshots=snapshots, solution={}, status=SolveStatus.UNBOUNDED)
-""" 
-Maximize Z = x₁ + 2x₂
-Subject to:
-    x₁ + 2x₂ ≤ 4
-    x₁ ≤ 3
-    x₂ ≤ 2
-    x₁, x₂ ≥ 0
-"""
-""" req = LPProblem(n=2, m=2, objective=ObjectiveType.MAX, 
-                objectiveCoeffs=[40.0, 30.0],
-                constraints=[
-                    Constraint(coefficients=[1, 1.0],sign=Operator.LE, rhs=12.0), 
-                    Constraint(coefficients=[2, 1.0], sign=Operator.GE, rhs=16.0)
-                ],
-                variableRestrictions=[True, True] ) """
-""" req = LPProblem(n=2, m=3, objective=ObjectiveType.MAX, 
-                objectiveCoeffs=[2, 1],
-                constraints=[
-                Constraint(coefficients=[1, 1.0],sign=Operator.GE, rhs=3), 
-                Constraint(coefficients=[1.0, 0], sign=Operator.LE, rhs=4),
-                Constraint(coefficients=[1.0, -1.0], sign=Operator.EQ, rhs=1),
-                # Constraint(coefficients=[1.0, 0], sign=Operator.LE, rhs=3),
-                ],
-                variableRestrictions=[False, True] ) """
-# req = LPProblem(n=3, m=3, objective=ObjectiveType.MAX,
-#                 objectiveCoeffs=[2345678.0, 3456789.0, 1234567.0],
-#                 constraints=[
-#                     Constraint(coefficients=[12345.0, 23456.0, 34567.0], sign=Operator.LE, rhs=1000000.0),
-#                     Constraint(coefficients=[98765.0, 87654.0, 76543.0], sign=Operator.GE, rhs=500000.0),
-#                     Constraint(coefficients=[11111.0, 22222.0, 33333.0], sign=Operator.LE, rhs=2000000.0)
-#                 ],
-#                 variableRestrictions=[True, True, True])
-# #print(req)
-# tableau = standardize(req)
-# print(tableau)
-# solveProblem(tableau)
+
+
 
 

@@ -71,6 +71,8 @@ class Tableau:
     art_start: int
     objective: ObjectiveType
 
+    variable_restrictions: Optional[List[bool]] = None
+
 
 
 

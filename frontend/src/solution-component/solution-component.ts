@@ -58,10 +58,22 @@ export class SolutionComponent implements OnInit {
 
   get slackVars(): Array<{ name: string; value: number; isBasic: boolean }> {
     if (!this.result) return [];
-    return Array.from({ length: this.problem.m }, (_, i) => {
-      const key = `s${i + 1}`;
-      const value = this.result!.solution[key] ?? 0;
-      return { name: key, value, isBasic: Math.abs(value) > 1e-9 };
+    const vars: Array<{ name: string; value: number; isBasic: boolean }> = [];
+    for (const [key, value] of Object.entries(this.result.solution)) {
+      if (key.match(/^[sea]\d+$/)) {
+        vars.push({
+          name: key,
+          value: value as number,
+          isBasic: Math.abs(value as number) > 1e-9,
+        });
+      }
+    }
+    return vars.sort((a, b) => {
+      const typeOrder: Record<string, number> = { s: 0, e: 1, a: 2 };
+      const typeA = typeOrder[a.name[0]];
+      const typeB = typeOrder[b.name[0]];
+      if (typeA !== typeB) return typeA - typeB;
+      return parseInt(a.name.slice(1)) - parseInt(b.name.slice(1));
     });
   }
 
