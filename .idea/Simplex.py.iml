@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/frontend/.angular/cache" />
       <excludeFolder url="file://$MODULE_DIR$/frontend/node_modules" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 (Simplex.py)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.13" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
